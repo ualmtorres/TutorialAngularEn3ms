@@ -1,0 +1,758 @@
+////
+NO CAMBIAR!!
+Codificación, idioma, tabla de contenidos, tipo de documento
+////
+:encoding: utf-8
+:lang: es
+:toc: right
+:toc-title: Tabla de contenidos
+:doctype: book
+:imagesdir: ./images
+
+
+
+
+////
+Nombre y título del trabajo
+////
+# Tutorial básico de Angular
+Desarrollo de Aplicaciones Híbridas 
+Máster TAII - UAL
+
+// NO CAMBIAR!! (Entrar en modo no numerado de apartados)
+:numbered!: 
+
+
+[abstract]
+##  Resumen
+
+En este tutorial estudiaremos las bases para el desarrollo de aplicaciones Angular introduciendo las técnicas básicas para el uso de componentes, servicios y enrutado.
+
+.Objetivos
+
+* Conocer la arquitectura de una aplicación Angular
+* Aprender a usar Angular CLI para la creación de elementos de una aplicación Angular
+* Aprender a crear componentes Angular
+* Utilizar formularios para edición de datos
+* Aprender a crear servicios Angular
+* Utilizar las directivas de Angular
+* Aprender a usar el enrutado
+
+// Entrar en modo numerado de apartados
+:numbered:
+
+## Introducción
+
+### Conocimientos previos
+
+Conocimientos básicos de:
+
+* HTML
+* CSS
+* JavaScript
+* Fundamentos de programación (funciones, condiciones, bucles, ...)
+
+### Qué es Angular
+
+* Framework JavaScript del lado del cliente
+* Creado y mantenido por Google
+* Usado para crear SPAs
+* Parte de la pila MEAN
+* Lo que sería HTML si se hubiese creado para aplicaciones web dinámicas
+
+### Lo que Angular no es 
+
+* Un framework del lado del servidor (como Express o NodeJS)
+* Una librería JavaScript (como jQuery o ReactJS)
+* Un patrón de diseño
+* Una plataforma o lenguaje (como Java o C#)
+* Un plugin
+
+### Versiones
+
+* AngularJS o Angular 1
+* Angular 2: Rescritura completa de AngularJS e incompatible con él
+* Angular 3: Saltada
+* Angular 4: Compatible con Angular 2 
+
+### Por qué usar Angular
+
+* Desarrollo rápido y Generación de código
+* Organización del código y Productividad
+* Genera contenido dinámico (p.e. mediante uso de bucles y condiciones)
+* Multiplataforma 
+* Preparado para pruebas unitarias
+
+### Características y Términos comunes
+
+* Componentes
+* Servicios
+* Routing
+* Testing
+* Herramientas de Build
+* Data binding
+* Templates
+* Módulo HTTP
+* Observables
+* Módulo para formularios
+* Directivas
+* Pipes
+* Eventos
+* Animación
+* TypeScript
+
+### TypeScript
+
+Angular 2 usa TypeScript:
+
+* Superconjunto de JavaScript con algunos extras (tipos, clases, ...)
+* Creado por Microsoft
+* Compilado (_Transpilado_) a JavaScript
+
+image:TypeScriptVsJavaScript.png[]
+
+### Componentes Angular
+
+* Bloques básicos de la UI. 
+* Una aplicación Angular es un conjunto de componentes.
+* Los decoradores permiten marcar una clase como un componente y proporcionan metadatos sobre cómo procesar, instanciar y usar el componente en la ejecución.
+* Toda aplicación Angular tiene un componente `App` en el que se anidan el resto de componentes de la aplicación.
+* Los selectores permiten definir etiquetas HTML para insertar el contenido del componente.
+
+### Servicios Angular
+
+* Clases que envían datos y funcionalidad a los componentes.
+* Mantienen ligeros a los componentes. Basta con inyectar el servicio al componente para que lo pueda usar.
+* DRY - Don't Repeat Yourself.
+* Ideal para llamadas Ajax.
+
+[source]
+----
+import { Injectable } from '@angular/core';
+
+import { User } from './user';
+import { USERS } from './mock-users';
+
+@Injectable()
+export class UserService {
+  
+  getUsers(): User[] {
+    return USERS;
+  }
+}
+----
+
+## Creación de una aplicación de ejemplo
+
+Partimos de un sistema con Node.js y Angular/CLI instalado:
+
+[source]
+----
+ng new angularEn3ms 
+cd angularEn3ms
+ng serve -o
+----
+
+[NOTE]
+====
+En el archivo `package.json` encontramos información sobre el proyecto, dependencias y versión de Angular.
+====
+
+### Archivos básicos
+
+.El archivo `app.component.ts`
+====
+[source]
+----
+import { Component } from '@angular/core';
+
+@Component({
+  selector: 'app-root', <1>
+  templateUrl: './app.component.html',
+  styleUrls: ['./app.component.css']
+})
+export class AppComponent {
+  title = 'app';
+}
+----
+<1> Selector que luego usará la aplicación (`index.html`) para mostrar su contenido (`app.component.html`)
+====
+
+.El archivo `index.html`
+====
+[source]
+----
+<!doctype html>
+<html lang="en">
+....
+<body>
+  <app-root></app-root> <1> 
+</body>
+</html>
+----
+<1> Tag personalizado para cargar el componente `App`. Hace referencia al selector definido en el archivo `.ts` de `App` (`app.component.ts`).
+====
+
+En el archivo `app.module.ts` se registran todos los componentes que se usan en la aplicación. Cada vez que creamos un componente con Angular/CLI, Angular/CLI actualiza este archivo.
+
+.El archivo `app.module.ts`
+====
+[source]
+----
+import { BrowserModule } from '@angular/platform-browser';
+import { NgModule } from '@angular/core';
+
+import { AppComponent } from './app.component'; <1>
+
+@NgModule({
+  declarations: [
+    AppComponent <2>
+  ],
+  imports: [
+    BrowserModule
+  ],
+  providers: [],
+  bootstrap: [AppComponent] <3>
+})
+export class AppModule { }
+----
+<1> Importación del componente App
+<2> Añadir la clase `AppComponent` al array `declarations` 
+<3> Componente principal que Angular inserta en el arvhivo `index.html`
+====
+
+### Creación del componente `user`
+
+[NOTE]
+====
+Dentro de `src/app` podemos crear una carpeta `components` para organizar los componentes de la aplicación
+====
+
+[source]
+----
+ng generate component components/user
+----
+
+Al crear el componente con Angular/CLI se modifica el archivo `app.module.ts` para incluir el nuevo componente.
+
+[source]
+----
+...
+import { UserComponent } from './components/user/user.component'; <1>
+
+
+@NgModule({
+  declarations: [
+    AppComponent,
+    UserComponent <2>
+  ],
+  ...
+})
+export class AppModule { }
+----
+<1> Importar el nuevo componente
+<2> Añadir la clase al array `declarations`
+
+.Actividad
+****
+. Eliminar el contenido de `app.component.html` y sustituirlo por el tag del componente `user` (`<app-user></app-user>`).
+. Sustituir el contenido de la plantilla de `user` (`src/app/components/user/user.component.html`) por `<h1>Usuario</h1>`
+****
+
+.Actividad
+****
+. Declarar variable de instancia `name = 'John Doe'` en `user.component.ts`
+. Sustituir el contenido de la plantilla  `user.component.html` por `<h1>Hello {{name}}</h1>`.
+`. Esto es lo que se conoce como _data binding_ y muestra en la plantilla el contenido de la variable.
+****
+
+[NOTE]
+====
+Si incializamos la variable en el constructor, prevalecerá este valor frente al creado al declarar la variable de instancia. En cambio, si inicializamos la variable en `ngOnInit()` prevalecerá este valor frente al asignado en el constructor.
+====
+
+### Tipos compuestos
+
+.Definiendo un tipo compuesto en `user.component.ts`
+====
+[source]
+----
+import { Component, OnInit } from '@angular/core';
+
+@Component({
+  selector: 'app-user',
+  templateUrl: './user.component.html',
+  styleUrls: ['./user.component.css']
+})
+export class UserComponent implements OnInit {
+  name: string;
+  age: number;
+  email: string;
+  address: { <1>
+    street: string,
+    city: string,
+    state: string
+  }
+
+  constructor() {   }
+
+  ngOnInit() {
+    this.name = "John Doe";
+    this.age = 30;
+    this.address = { <2>
+      street: '50 Main St',
+      city: 'Boston',
+      state: 'MA'
+    }
+  }
+
+}
+----
+<1> Definición de un tipo compuesto
+<2> Inicialización del tipo compuesto
+====
+
+.Uso de un tipo de compuesto en `user.component.html`
+====
+[source, html]
+----
+<h1>Hello {{name}}</h1>
+<p>Edad: {{age}}</p>
+<p>Email: {{email}}</p>
+<p>Dirección: {{address.street}}. {{address.city}}, {{address.state}}</p> <1>
+----
+<1> Acceso a los valores del tipo compuesto
+====
+
+### Uso de interfaces
+
+.Creacion de una interfaz `Address`
+====
+[source]
+----
+import { Component, OnInit } from '@angular/core';
+
+@Component({
+  selector: 'app-user',
+  templateUrl: './user.component.html',
+  styleUrls: ['./user.component.css']
+})
+export class UserComponent implements OnInit {
+  name: string;
+  age: number;
+  email: string;
+  address: Address; <1>
+
+  constructor() {   }
+
+  ngOnInit() {
+    this.name = "John Doe";
+    this.age = 30;
+    this.address = {
+      street: '50 Main St',
+      city: 'Boston',
+      state: 'MA'
+    }
+  }
+
+}
+
+interface Address { <2>
+  street: string,
+  city: string,
+  state: string
+}
+----
+<1> Uso del tipo `Address`
+<2> Creación del tipo `Address`
+====
+
+### Uso de arrays
+
+.Declaración e inicialización del array en `user.component.ts`
+====
+[source]
+----
+....
+export class UserComponent implements OnInit {
+  ....
+  hobbies: string[]; <1>
+
+  constructor() {   }
+
+  ngOnInit() {
+    ...
+    this.hobbies = ['Ir al cine', 'Pasear', 'Leer']; <2>
+  }
+
+}
+...
+----
+<1> Declaración de un array de cadenas
+<2> Inicialización del array
+====
+
+.Uso del array en `user.component.html`
+====
+[source]
+----
+....
+<h2>Hobbies</h2>
+<ul>
+    <li *ngFor="let hobby of hobbies">{{hobby}}</li> <1>
+</ul>
+----
+<1> Angular duplica cada entrada `<li>` por cada elemento que encuentre en el array `hobbies`. La variable `hobby` toma el valor de cada elemento del array en cada iteración
+====
+
+### Añadir y eliminar datos
+
+Si vamos a trabajar con formularios debemos modificar el archivo `app.module.ts` para importar `FormsModule`.
+
+.Modificación de `app.module.ts` para importar `FormsModule`
+====
+[source]
+----
+...
+import { FormsModule } from '@angular/forms'; <1>
+...
+@NgModule({
+  ...,
+  imports: [
+    BrowserModule,
+    FormsModule <2>
+  ],
+  ...
+})
+...
+----
+<1> Importar el módulo `FormsModule`
+<2> Añadir `FormsModule` al array `imports`
+====
+
+.Métodos para insertar y eliminar hobbies en `user.component.ts`
+====
+[source]
+----
+...
+export class UserComponent implements OnInit {
+  ...
+  addHobby(hobby) { <1> 
+    this.hobbies.push(hobby); <2> 
+    return false;
+  }
+
+  deleteHobby(hobby) { <3>
+    for (let i=0; i<this.hobbies.length; i++) {
+      if (this.hobbies[i] == hobby) {
+        this.hobbies.splice(i, 1); <4>
+      }
+    }
+  }
+
+}
+...
+----
+<1> Método para añadir un nuevo hobby
+<2> Añadir el parámetro `hobby` al array `hobbies`
+<3> Método para eliminar un hobby
+<4> Tras localizar el hobby a eliminar, eliminarlo del array
+====
+
+.Añadiendo y eliminando hobbies en `user.component.html`
+====
+[source]
+----
+....
+<form (submit)="addHobby(hobby.value)"> <1> 
+    <div>
+        <label for="hobby">Hobby:</label>
+        <input type="text" #hobby> <2>
+    </div>
+    <button >Añadir Hobby</button> <3>
+</form>
+
+<h2>Hobbies</h2>
+<ul>
+    <li *ngFor="let hobby of hobbies">
+        {{hobby}}<button (click)="deleteHobby(hobby)">Eliminar</button> <4>
+    </li>
+</ul>
+....
+----
+<1> Formulario para añadir un hobby. El método `addHobby()` incluye como parámetro el valor del elemento cuyo id es `hobby`
+<2> Creación de un cuadro de texto con id `hobby` para permitir acceder a su valor
+<3> Botón para el envío de datos
+<4> Llamada al método `deleteHobby()` pasándole como parámetro el hobby actual
+====
+
+### Formularios para la edición de datos
+
+.Formulario para modificación de usuarios en `user.component.html`
+====
+[source]
+----
+<form>
+    <div>
+        <label for="name">Name:</label>
+        <input type="text" [(ngModel)]="name" name="name"> <1>
+    </div>
+    <div>
+        <label for="age">Age:</label>
+        <input type="text" [(ngModel)]="age" name="age">
+    </div>
+    <div>
+        <label for="email">Email:</label>
+        <input type="text" [(ngModel)]="email" name="email">
+    </div>
+    <div>
+        <label for="street">Street:</label>
+        <input type="text" [(ngModel)]="address.street" name="street"> <2>
+    </div>
+    <div>
+        <label for="city">City:</label>
+        <input type="text" [(ngModel)]="address.city" name="city">
+    </div>
+    <div>
+        <label for="state">State:</label>
+        <input type="text" [(ngModel)]="address.state" name="state">
+    </div>
+</form>
+----
+<1> Cuadro de texto ligado a la variable de instancia `name` con `[(ngModel)]="name"`
+<2> Cuadro de texto ligado a la variable de instancia `address.street` con `[(ngModel)]="address.street"`
+====
+
+### Creación de un servicio de datos
+
+[NOTE]
+====
+Dentro de `src/app` podemos crear una carpeta `services` para organizar los servicios de la aplicación
+====
+
+[source]
+----
+ng generate service services/data
+----
+
+[WARNING]
+====
+A diferencia de los componentes, al crear el servicio con Angular/CLI no se modifica el archivo `app.module.ts` para incluir el nuevo servicio, por lo que hay que modificarlo manualmente.
+====
+
+En nuestra aplicación el servicio va a recuperar datos de una URL, por lo que también necesitaremos importar `HttpModule`
+
+.Modificación del archivo `app.module.ts` para añadir el servicio
+====
+[source]
+----
+...
+import { DataService } from './services/data.service'; <1>
+import { HttpModule } from '@angular/http' <2>
+
+...
+@NgModule({
+  ...
+  imports: [
+    ...
+    HttpModule <3>
+  ],
+  providers: [DataService], <4>
+  ...
+})
+export class AppModule { }
+----
+<1> Importar el servicio
+<2> Importar `HttpModule`
+<3> Añadir `HttpModule` al array `imports`
+<4> Añadir el servicio al array `providers`
+====
+
+.El servicio `data.service.ts`
+====
+[source]
+----
+import { Injectable } from '@angular/core';
+import { Http } from '@angular/http'; <1>
+import 'rxjs/add/operator/map'; <2>
+
+@Injectable()
+export class DataService {
+
+  constructor(public http:Http) { } <3>
+
+  getPosts() { <4>
+    return this.http.get('https://jsonplaceholder.typicode.com/posts').
+    map(res => res.json()); <5>
+  }
+}
+----
+<1> Importar `Http` para usarlo en el constructor. Esto es una inyección de dependencias. Con `Http` podremos usar el método `get()` para recuperar datos de una URL.
+<2> Importar de ReactJS el operador `map`. 
+<3> Inyección de `http` en el constructor
+<4> Método `getPosts()` encargado de obtener los posts
+<5> Función `map` que transforma la respuesta recibida `res` en JSON
+====
+
+.Observables y el operador `map`
+****
+http devuelve lo que se conoce como un _observable_, que podemos entender como un flujo de datos.
+
+El operador `map` se aplica a un observable (p.e. `http`) y transforma los elementos recibidos desde el observable aplicando a cada uno una funcion (la función _arrow_).
+****
+
+.Modificar `user.component.ts` para consumir del servicio
+====
+[source]
+----
+...
+import { DataService } from '../../services/data.service'; <1>
+...
+export class UserComponent implements OnInit {
+  ...
+  posts: Post[]; <2>
+
+  constructor(private dataService: DataService) {   } <3>
+
+  ngOnInit() {
+    ...
+
+    this.dataService.getPosts().subscribe((posts) => { <4>
+      this.posts = posts; <5>
+    })
+  }
+
+  ...
+
+}
+
+interface Post { <6>
+  id: number,
+  title: string,
+  body: string,
+  userId: number
+}
+----
+<1> Importar el servicio
+<2> Variable de instancia para el array de posts
+<3> Inyección del servicio
+<4> Suscripción al servicio
+<5> Función anónima que asigna la respuesta `posts` a la variable de instancia `posts`
+<6> Definición del tipo `Post`
+====
+
+.Modificación de la plantilla `user.component.html` para mostrar los posts
+====
+[source]
+----
+<h2>Posts</h2>
+<ul>
+    <li *ngFor="let post of posts"> <1>
+        <h4>{{post.title}}</h4> <2>
+        <p>{{post.body}}</p> <3>
+    </li>
+</ul>
+----
+<1> Iteración sobre el array de posts
+<2> Mostrar el título el post
+<3> Mostrar el cuerpo del post
+====
+
+### Presentación condicional
+
+Usaremos la directiva `*ngIf` para mostrar u ocultar el formulario de edición del usuario. Necesitaremos una variable booleana que nos indique si se puede editar o no, y una función que modifique la variable booleana.
+
+.Modificación de `user.component.ts` para permitir la presentación condicional
+====
+[source]
+----
+...
+export class UserComponent implements OnInit {
+  ...
+  isEdit: boolean = false; <1>
+  ....
+  toggleEdit() { <2>
+    this.isEdit = !this.isEdit;
+  }
+
+}
+....
+----
+<1> Variable booleana para controlar la presentación o no del formulario
+<2> Método para conmutar la propiedad booleana
+====
+
+
+.Modificación de `user.component.html` para la presentación condicional del formulario de edición
+====
+[source]
+----
+...
+<button (click)="toggleEdit()">Editar</button> <1>
+
+<div *ngIf=isEdit> <2>
+    <form>
+        ...
+    </form>
+</div>
+...
+----
+<1> Botón que llama al método `toggleEdit()` para conmutar la edición
+<2> Capa de presentación condicional. Uso de la directiva `*ngIf` de Angular para comprobar el valor de la variable de instancia `isEdit`. La capa se presentará si `isEdit` es `true` 
+====
+
+### Rutas en Angular
+
+Con Angular/CLI creamos un nuevo componente `about` que estará disponible en la ruta `/about`
+
+[source]
+----
+ng generate component components/about
+----
+
+Esto creará el componente y actualizará el archivo `app.module.ts`.
+
+Además, habrá que modificar el archivo `app.module.ts` para importar los módulos de _routing_
+
+.Modificación del archivo `app.module.ts`
+====
+[source]
+----
+...
+import { RouterModule, Routes} from '@angular/router'; <1>
+...
+const appRoutes: Routes = [ <2>
+  {path: '', component:UserComponent}, <3>
+  {path: 'about', component:AboutComponent} <4>
+]
+...
+@NgModule({
+  ...
+  imports: [
+    ...
+    RouterModule.forRoot(appRoutes) <5>
+  ],
+  ...
+})
+...
+----
+<1> Importar los módulos de _routing_
+<2> Declaración del array de rutas
+<3> La ruta raíz muestra el componente `user`
+<4> La ruta `about` muestra el componente `about`
+<5> Añadir las rutas definidas en `appRoutes` al array `imports`
+====
+
+.Modificación del archivo `app.component.html` para que muestre el componente de acuerdo a la ruta seleccionada
+====
+[source]
+----
+<ul> <1>
+    <li><a routerLink="/">User</a></li>
+    <li><a routerLink="/about">About</a></li>
+</ul>
+<router-outlet></router-outlet> <2>
+----
+<1> Menú de navegación
+<2> Selector para colocar el componente de acuerdo a la ruta seleccionada
+====
